@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import { useState } from 'react'
 import {
-  Routes, Route, Link, useMatch
+  Routes, Route, Link, useMatch, useNavigate
 } from 'react-router-dom'
 
 const Menu = () => {
@@ -120,15 +120,23 @@ const App = () => {
     }
   ])
 
+  const navigate = useNavigate()
+
   const noteMatch = useMatch('/anecdotes/:id')
   const selectedAnecdote = noteMatch
     ? anecdotes.find(a => a.id === Number(noteMatch.params.id))
     : null
+  
   const [notification, setNotification] = useState('')
 
   const addNew = (anecdote) => {
     anecdote.id = Math.round(Math.random() * 10000)
     setAnecdotes(anecdotes.concat(anecdote))
+    setNotification(`a new anecdote ${anecdote.content} created!`)
+    navigate('/')
+    setTimeout(() => {
+      setNotification('')
+    }, 5000)
   }
 
   const anecdoteById = (id) =>
@@ -150,6 +158,7 @@ const App = () => {
       <div>
         <h1>Software anecdotes</h1>
         <Menu />
+        {notification}
       </div>
 
       <Routes>

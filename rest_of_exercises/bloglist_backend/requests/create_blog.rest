@@ -1,0 +1,10 @@
+POST http://localhost:3003/api/blogs
+Authorization: Bearer <your_token_here>
+Content-Type: application/json
+
+{
+    "title": "iamtitle",
+    "author": "authori1",
+    "url": "uu r l",
+    "likes": "42"
+}

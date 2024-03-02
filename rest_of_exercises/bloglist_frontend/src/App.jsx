@@ -5,13 +5,17 @@ import loginService from './services/login'
 import Notification from './components/Notification'
 import BlogCreation from './components/BlogCreation'
 import Togglable from './components/Togglable'
+import { useDispatch, useSelector } from 'react-redux'
+import { setNotification } from './reducers/notificationReducer'
 
 const App = () => {
+  const dispatch = useDispatch()
+  const infoMessage = useSelector((state) => state.notification)
+
   const [blogs, setBlogs] = useState([])
   const [user, setUser] = useState(null)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const [infoMessage, setInfoMessage] = useState({ message: null, type: null })
   const showBlogRef = useRef()
 
   useEffect(() => {
@@ -39,9 +43,9 @@ const App = () => {
   }
 
   const notifyWith = (message, type = 'info') => {
-    setInfoMessage({ message, type })
+    dispatch(setNotification({ message, type }))
     setTimeout(() => {
-      setInfoMessage({ message: null, type: null })
+      dispatch(setNotification({ message: '', type: 'info' }))
     }, 4000)
   }
 

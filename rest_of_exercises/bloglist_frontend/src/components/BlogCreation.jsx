@@ -13,7 +13,7 @@ const BlogCreation = ({ blogs, setBlogs, notifyWith, blogRef, addBlog }) => {
     const blogObject = {
       title: title,
       author: author,
-      url: url
+      url: url,
     }
 
     await addBlog(blogObject)
@@ -67,7 +67,7 @@ BlogCreation.propTypes = {
   setBlogs: PropTypes.func.isRequired,
   notifyWith: PropTypes.func.isRequired,
   blogRef: PropTypes.object.isRequired,
-  addBlog: PropTypes.func.isRequired
+  addBlog: PropTypes.func.isRequired,
 }
 
 export default BlogCreation

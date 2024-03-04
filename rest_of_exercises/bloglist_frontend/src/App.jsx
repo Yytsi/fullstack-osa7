@@ -8,13 +8,14 @@ import Togglable from './components/Togglable'
 import { useDispatch, useSelector } from 'react-redux'
 import { setNotification } from './reducers/notificationReducer'
 import { setBlogs } from './reducers/blogReducer'
+import { setUser } from './reducers/userReducer'
 
 const App = () => {
   const dispatch = useDispatch()
   const infoMessage = useSelector((state) => state.notification)
   const blogs = useSelector((state) => state.blogs)
+  const user = useSelector((state) => state.user)
 
-  const [user, setUser] = useState(null)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const showBlogRef = useRef()
@@ -23,7 +24,7 @@ const App = () => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogAppUser')
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
-      setUser(user)
+      dispatch(setUser(user))
     }
   }, [])
 
@@ -62,7 +63,7 @@ const App = () => {
       })
 
       window.localStorage.setItem('loggedBlogAppUser', JSON.stringify(user))
-      setUser(user)
+      dispatch(setUser(user))
       notifyWith(`Welcome back ${user.name} !`)
       setUsername('')
       setPassword('')
@@ -119,7 +120,7 @@ const App = () => {
       <button
         onClick={() => {
           window.localStorage.removeItem('loggedBlogAppUser')
-          setUser(null)
+          dispatch(setUser(null))
         }}
       >
         logout

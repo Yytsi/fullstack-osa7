@@ -7,12 +7,13 @@ import BlogCreation from './components/BlogCreation'
 import Togglable from './components/Togglable'
 import { useDispatch, useSelector } from 'react-redux'
 import { setNotification } from './reducers/notificationReducer'
+import { setBlogs } from './reducers/blogReducer'
 
 const App = () => {
   const dispatch = useDispatch()
   const infoMessage = useSelector((state) => state.notification)
+  const blogs = useSelector((state) => state.blogs)
 
-  const [blogs, setBlogs] = useState([])
   const [user, setUser] = useState(null)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -27,7 +28,9 @@ const App = () => {
   }, [])
 
   useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs))
+    blogService.getAll().then((receivedBlogs) => {
+      dispatch(setBlogs(receivedBlogs))
+    })
   }, [])
 
   const likeBlog = async (blog) => {
@@ -39,7 +42,7 @@ const App = () => {
 
     const response = await blogService.putBlog(updatedBlog)
     const newBlogs = await blogService.getAll()
-    setBlogs(newBlogs)
+    dispatch(setBlogs(newBlogs))
   }
 
   const notifyWith = (message, type = 'info') => {
@@ -73,7 +76,7 @@ const App = () => {
     try {
       const returnedBlog = await blogService.create(blogObject)
       const allBlogs = await blogService.getAll()
-      setBlogs(blogs.concat(returnedBlog))
+      dispatch(setBlogs(blogs.concat(returnedBlog)))
       notifyWith(
         `A new blog ${returnedBlog.title} by ${returnedBlog.author} added`
       )
@@ -125,19 +128,19 @@ const App = () => {
       <Togglable buttonLabel="new blog" ref={showBlogRef}>
         <BlogCreation
           blogs={blogs}
-          setBlogs={setBlogs}
+          setBlogs={(x) => dispatch(setBlogs(x))}
           notifyWith={notifyWith}
           blogRef={showBlogRef}
           addBlog={addBlog}
         />
       </Togglable>
-      {blogs
+      {[...blogs]
         .sort((a, b) => b.likes - a.likes)
         .map((blog) => (
           <Blog
             key={blog.id}
             blog={blog}
-            setBlogs={setBlogs}
+            setBlogs={(x) => dispatch(setBlogs(x))}
             showRemoveButton={user.username === blog.user.username}
             likeBlog={likeBlog}
           />

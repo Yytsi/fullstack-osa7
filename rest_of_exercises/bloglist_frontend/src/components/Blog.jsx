@@ -11,7 +11,7 @@ const Blog = ({ blog, setBlogs, showRemoveButton, likeBlog }) => {
     border: 'solid',
     borderWidth: 1,
     marginBottom: 5,
-    width: '50%'
+    width: '50%',
   }
 
   const handleRemove = async () => {
@@ -27,9 +27,15 @@ const Blog = ({ blog, setBlogs, showRemoveButton, likeBlog }) => {
       <div>
         {blog.title} <br />
         {blog.url} <br />
-        likes {blog.likes} <button onClick={async () => {
-          await likeBlog(blog)
-        }}>like</button> <br />
+        likes {blog.likes}{' '}
+        <button
+          onClick={async () => {
+            await likeBlog(blog)
+          }}
+        >
+          like
+        </button>{' '}
+        <br />
         {blog.author}
         {showRemoveButton && <button onClick={handleRemove}>remove</button>}
       </div>
@@ -45,9 +51,11 @@ const Blog = ({ blog, setBlogs, showRemoveButton, likeBlog }) => {
   }
 
   return (
-    <div style={blogStyle} className='blog'>
+    <div style={blogStyle} className="blog">
       {isExpanded ? expandedForm() : collapsedForm()}
-      <button onClick={() => setIsExpanded(!isExpanded)}>{isExpanded ? 'hide' : 'view'}</button>
+      <button onClick={() => setIsExpanded(!isExpanded)}>
+        {isExpanded ? 'hide' : 'view'}
+      </button>
     </div>
   )
 }
@@ -56,7 +64,7 @@ Blog.propTypes = {
   blog: PropTypes.object.isRequired,
   setBlogs: PropTypes.func.isRequired,
   showRemoveButton: PropTypes.bool.isRequired,
-  likeBlog: PropTypes.func.isRequired
+  likeBlog: PropTypes.func.isRequired,
 }
 
 export default Blog

@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import blogService from '../services/blogs'
 
-const BlogCreation = ({ blogs, setBlogs, notifyWith, blogRef, addBlog }) => {
+const BlogCreation = ({ blogs, notifyWith, blogRef, addBlog }) => {
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [url, setUrl] = useState('')
@@ -64,7 +64,6 @@ const BlogCreation = ({ blogs, setBlogs, notifyWith, blogRef, addBlog }) => {
 
 BlogCreation.propTypes = {
   blogs: PropTypes.array.isRequired,
-  setBlogs: PropTypes.func.isRequired,
   notifyWith: PropTypes.func.isRequired,
   blogRef: PropTypes.object.isRequired,
   addBlog: PropTypes.func.isRequired,

@@ -10,14 +10,16 @@ import NotificationContext, {
   setNotification,
   clearNotification,
 } from './NotificationContext'
+import BlogContext, { setBlogs } from './BlogContext'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 
 const App = () => {
-  const [blogs, setBlogs] = useState([])
   const [user, setUser] = useState(null)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [notification, notificationDispatch] = useContext(NotificationContext)
   const showBlogRef = useRef()
+  const queryClient = useQueryClient()
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogAppUser')
@@ -27,20 +29,42 @@ const App = () => {
     }
   }, [])
 
-  useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs))
-  }, [])
+  const result = useQuery({
+    queryKey: ['blogs'],
+    queryFn: () => blogService.getAll(),
+    refetchOnWindowFocus: false,
+  })
+
+  const blogs = result.data || []
+
+  const blogPutMutation = useMutation({
+    mutationFn: (blog) => blogService.putBlog(blog),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['blogs'] })
+    },
+  })
+
+  const blogAddMutation = useMutation({
+    mutationFn: (blog) => blogService.create(blog),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['blogs'] })
+    },
+  })
 
   const likeBlog = async (blog) => {
-    const updatedBlog = {
+    // const updatedBlog = {
+    //   ...blog,
+    //   user: blog.user.id,
+    //   likes: blog.likes + 1,
+    // }
+
+    // const response = await blogService.putBlog(updatedBlog)
+    // const newBlogs = await blogService.getAll()
+    blogPutMutation.mutate({
       ...blog,
       user: blog.user.id,
       likes: blog.likes + 1,
-    }
-
-    const response = await blogService.putBlog(updatedBlog)
-    const newBlogs = await blogService.getAll()
-    setBlogs(newBlogs)
+    })
   }
 
   const notifyWith = (message, type = 'info') => {
@@ -72,12 +96,8 @@ const App = () => {
   const addBlog = async (blogObject) => {
     showBlogRef.current.toggleVisibility()
     try {
-      const returnedBlog = await blogService.create(blogObject)
-      const allBlogs = await blogService.getAll()
-      setBlogs(blogs.concat(returnedBlog))
-      notifyWith(
-        `A new blog ${returnedBlog.title} by ${returnedBlog.author} added`
-      )
+      blogAddMutation.mutate(blogObject)
+      notifyWith(`A new blog ${blogObject.title} by ${blogObject.author} added`)
     } catch (exception) {
       notifyWith('error creating blog', 'error')
       console.log('creating a blog and got exception', exception)
@@ -126,7 +146,6 @@ const App = () => {
       <Togglable buttonLabel="new blog" ref={showBlogRef}>
         <BlogCreation
           blogs={blogs}
-          setBlogs={setBlogs}
           notifyWith={notifyWith}
           blogRef={showBlogRef}
           addBlog={addBlog}

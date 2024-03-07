@@ -1,9 +1,13 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import blogService from '../services/blogs'
+import { useContext } from 'react'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 const Blog = ({ blog, setBlogs, showRemoveButton, likeBlog }) => {
   const [isExpanded, setIsExpanded] = useState(false)
+
+  const queryClient = useQueryClient()
 
   const blogStyle = {
     paddingTop: 10,
@@ -14,11 +18,20 @@ const Blog = ({ blog, setBlogs, showRemoveButton, likeBlog }) => {
     width: '50%',
   }
 
+  const deleteBlogMutation = useMutation({
+    mutationFn: (blog) => blogService.deleteBlog(blog),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['blogs'] })
+    },
+  })
+
   const handleRemove = async () => {
     if (window.confirm(`Remove blog ${blog.title} by ${blog.author}?`)) {
-      await blogService.deleteBlog(blog)
-      const newBlogs = await blogService.getAll()
-      setBlogs(newBlogs)
+      try {
+        await deleteBlogMutation.mutateAsync(blog)
+      } catch (error) {
+        console.error(error)
+      }
     }
   }
 

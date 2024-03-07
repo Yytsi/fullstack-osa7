@@ -1,37 +1,34 @@
 import { useState, useRef, useEffect } from 'react'
+import { useContext } from 'react'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import Notification from './components/Notification'
 import BlogCreation from './components/BlogCreation'
 import Togglable from './components/Togglable'
-import { useDispatch, useSelector } from 'react-redux'
-import { setNotification } from './reducers/notificationReducer'
-import { setBlogs } from './reducers/blogReducer'
-import { setUser } from './reducers/userReducer'
+import NotificationContext, {
+  setNotification,
+  clearNotification,
+} from './NotificationContext'
 
 const App = () => {
-  const dispatch = useDispatch()
-  const infoMessage = useSelector((state) => state.notification)
-  const blogs = useSelector((state) => state.blogs)
-  const user = useSelector((state) => state.user)
-
+  const [blogs, setBlogs] = useState([])
+  const [user, setUser] = useState(null)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const [notification, notificationDispatch] = useContext(NotificationContext)
   const showBlogRef = useRef()
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogAppUser')
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
-      dispatch(setUser(user))
+      setUser(user)
     }
   }, [])
 
   useEffect(() => {
-    blogService.getAll().then((receivedBlogs) => {
-      dispatch(setBlogs(receivedBlogs))
-    })
+    blogService.getAll().then((blogs) => setBlogs(blogs))
   }, [])
 
   const likeBlog = async (blog) => {
@@ -43,13 +40,13 @@ const App = () => {
 
     const response = await blogService.putBlog(updatedBlog)
     const newBlogs = await blogService.getAll()
-    dispatch(setBlogs(newBlogs))
+    setBlogs(newBlogs)
   }
 
   const notifyWith = (message, type = 'info') => {
-    dispatch(setNotification({ message, type }))
+    notificationDispatch(setNotification(message, type))
     setTimeout(() => {
-      dispatch(setNotification({ message: '', type: 'info' }))
+      notificationDispatch(clearNotification())
     }, 4000)
   }
 
@@ -63,7 +60,7 @@ const App = () => {
       })
 
       window.localStorage.setItem('loggedBlogAppUser', JSON.stringify(user))
-      dispatch(setUser(user))
+      setUser(user)
       notifyWith(`Welcome back ${user.name} !`)
       setUsername('')
       setPassword('')
@@ -77,7 +74,7 @@ const App = () => {
     try {
       const returnedBlog = await blogService.create(blogObject)
       const allBlogs = await blogService.getAll()
-      dispatch(setBlogs(blogs.concat(returnedBlog)))
+      setBlogs(blogs.concat(returnedBlog))
       notifyWith(
         `A new blog ${returnedBlog.title} by ${returnedBlog.author} added`
       )
@@ -91,7 +88,7 @@ const App = () => {
     return (
       <div>
         <h2>Log in to application</h2>
-        <Notification info={infoMessage} />
+        <Notification info={notification} />
         <form onSubmit={handleLogin}>
           <div>
             username
@@ -120,28 +117,28 @@ const App = () => {
       <button
         onClick={() => {
           window.localStorage.removeItem('loggedBlogAppUser')
-          dispatch(setUser(null))
+          setUser(null)
         }}
       >
         logout
       </button>
-      <Notification info={infoMessage} />
+      <Notification info={notification} />
       <Togglable buttonLabel="new blog" ref={showBlogRef}>
         <BlogCreation
           blogs={blogs}
-          setBlogs={(x) => dispatch(setBlogs(x))}
+          setBlogs={setBlogs}
           notifyWith={notifyWith}
           blogRef={showBlogRef}
           addBlog={addBlog}
         />
       </Togglable>
-      {[...blogs]
+      {blogs
         .sort((a, b) => b.likes - a.likes)
         .map((blog) => (
           <Blog
             key={blog.id}
             blog={blog}
-            setBlogs={(x) => dispatch(setBlogs(x))}
+            setBlogs={setBlogs}
             showRemoveButton={user.username === blog.user.username}
             likeBlog={likeBlog}
           />

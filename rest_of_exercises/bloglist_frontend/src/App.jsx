@@ -10,14 +10,15 @@ import NotificationContext, {
   setNotification,
   clearNotification,
 } from './NotificationContext'
+import UserContext, { setUser, clearUser } from './UserContext'
 import BlogContext, { setBlogs } from './BlogContext'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 
 const App = () => {
-  const [user, setUser] = useState(null)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [notification, notificationDispatch] = useContext(NotificationContext)
+  const [user, userDispatch] = useContext(UserContext)
   const showBlogRef = useRef()
   const queryClient = useQueryClient()
 
@@ -25,7 +26,7 @@ const App = () => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogAppUser')
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
-      setUser(user)
+      userDispatch(setUser(user))
     }
   }, [])
 
@@ -84,7 +85,7 @@ const App = () => {
       })
 
       window.localStorage.setItem('loggedBlogAppUser', JSON.stringify(user))
-      setUser(user)
+      userDispatch(setUser(user))
       notifyWith(`Welcome back ${user.name} !`)
       setUsername('')
       setPassword('')
@@ -137,7 +138,7 @@ const App = () => {
       <button
         onClick={() => {
           window.localStorage.removeItem('loggedBlogAppUser')
-          setUser(null)
+          userDispatch(clearUser())
         }}
       >
         logout
@@ -157,7 +158,6 @@ const App = () => {
           <Blog
             key={blog.id}
             blog={blog}
-            setBlogs={setBlogs}
             showRemoveButton={user.username === blog.user.username}
             likeBlog={likeBlog}
           />

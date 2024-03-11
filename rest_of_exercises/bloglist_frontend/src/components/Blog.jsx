@@ -4,7 +4,7 @@ import blogService from '../services/blogs'
 import { useContext } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 
-const Blog = ({ blog, setBlogs, showRemoveButton, likeBlog }) => {
+const Blog = ({ blog, showRemoveButton, likeBlog }) => {
   const [isExpanded, setIsExpanded] = useState(false)
 
   const queryClient = useQueryClient()
@@ -75,7 +75,6 @@ const Blog = ({ blog, setBlogs, showRemoveButton, likeBlog }) => {
 
 Blog.propTypes = {
   blog: PropTypes.object.isRequired,
-  setBlogs: PropTypes.func.isRequired,
   showRemoveButton: PropTypes.bool.isRequired,
   likeBlog: PropTypes.func.isRequired,
 }

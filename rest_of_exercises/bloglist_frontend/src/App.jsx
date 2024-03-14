@@ -14,7 +14,8 @@ import UserContext, { setUser, clearUser } from './UserContext'
 import BlogContext, { setBlogs } from './BlogContext'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
-import { UserList } from './components/UserList'
+import { UserList } from './components/UsersList'
+import { UserBlogs } from './components/UserBlogs'
 
 const App = () => {
   const [username, setUsername] = useState('')
@@ -165,6 +166,7 @@ const App = () => {
           }
         />
         <Route path="/users" element={<UserList />} />
+        <Route path="/users/:id" element={<UserBlogs />} />
       </Routes>
     </div>
   )

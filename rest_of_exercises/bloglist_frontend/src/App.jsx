@@ -13,6 +13,8 @@ import NotificationContext, {
 import UserContext, { setUser, clearUser } from './UserContext'
 import BlogContext, { setBlogs } from './BlogContext'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
+import { UserList } from './components/UserList'
 
 const App = () => {
   const [username, setUsername] = useState('')
@@ -53,14 +55,6 @@ const App = () => {
   })
 
   const likeBlog = async (blog) => {
-    // const updatedBlog = {
-    //   ...blog,
-    //   user: blog.user.id,
-    //   likes: blog.likes + 1,
-    // }
-
-    // const response = await blogService.putBlog(updatedBlog)
-    // const newBlogs = await blogService.getAll()
     blogPutMutation.mutate({
       ...blog,
       user: blog.user.id,
@@ -144,24 +138,34 @@ const App = () => {
         logout
       </button>
       <Notification info={notification} />
-      <Togglable buttonLabel="new blog" ref={showBlogRef}>
-        <BlogCreation
-          blogs={blogs}
-          notifyWith={notifyWith}
-          blogRef={showBlogRef}
-          addBlog={addBlog}
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <div>
+              <Togglable buttonLabel="new blog" ref={showBlogRef}>
+                <BlogCreation
+                  blogs={blogs}
+                  notifyWith={notifyWith}
+                  blogRef={showBlogRef}
+                  addBlog={addBlog}
+                />
+              </Togglable>
+              {[...blogs]
+                .sort((a, b) => b.likes - a.likes)
+                .map((blog) => (
+                  <Blog
+                    key={blog.id}
+                    blog={blog}
+                    showRemoveButton={user.username === blog.user.username}
+                    likeBlog={likeBlog}
+                  />
+                ))}
+            </div>
+          }
         />
-      </Togglable>
-      {[...blogs]
-        .sort((a, b) => b.likes - a.likes)
-        .map((blog) => (
-          <Blog
-            key={blog.id}
-            blog={blog}
-            showRemoveButton={user.username === blog.user.username}
-            likeBlog={likeBlog}
-          />
-        ))}
+        <Route path="/users" element={<UserList />} />
+      </Routes>
     </div>
   )
 }

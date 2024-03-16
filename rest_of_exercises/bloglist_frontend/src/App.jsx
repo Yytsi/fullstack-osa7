@@ -13,9 +13,16 @@ import NotificationContext, {
 import UserContext, { setUser, clearUser } from './UserContext'
 import BlogContext, { setBlogs } from './BlogContext'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Link,
+  useMatch,
+} from 'react-router-dom'
 import { UserList } from './components/UsersList'
 import { UserBlogs } from './components/UserBlogs'
+import { BlogExtView } from './components/BlogExtView'
 
 const App = () => {
   const [username, setUsername] = useState('')
@@ -40,6 +47,8 @@ const App = () => {
   })
 
   const blogs = result.data || []
+
+  const blogIdMatch = useMatch('/blogs/:id')
 
   const blogPutMutation = useMutation({
     mutationFn: (blog) => blogService.putBlog(blog),
@@ -167,6 +176,26 @@ const App = () => {
         />
         <Route path="/users" element={<UserList />} />
         <Route path="/users/:id" element={<UserBlogs />} />
+        <Route
+          path="/blogs/:id"
+          element={
+            <BlogExtView
+              blog={
+                blogIdMatch
+                  ? blogs.find((blog) => blog.id === blogIdMatch.params.id)
+                  : null
+              }
+              showRemoveButton={
+                blogs && user && blogIdMatch
+                  ? user.username ===
+                    blogs.find((blog) => blog.id === blogIdMatch?.params?.id)
+                      ?.user?.username
+                  : false
+              }
+              likeBlog={likeBlog}
+            />
+          }
+        />
       </Routes>
     </div>
   )

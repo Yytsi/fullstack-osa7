@@ -1,9 +1,8 @@
 import { useMatch } from 'react-router-dom'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { getAllUsers } from '../services/users'
 
 export const UserBlogs = () => {
-  const queryClient = useQueryClient()
   const usersQuery = useQuery({
     queryKey: ['users'],
     queryFn: () => getAllUsers(),

@@ -11,7 +11,6 @@ export const UserList = () => {
   })
 
   const users = usersQuery.data || []
-  console.log(users)
 
   return (
     <div>

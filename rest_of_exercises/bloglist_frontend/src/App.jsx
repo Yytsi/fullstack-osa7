@@ -137,16 +137,32 @@ const App = () => {
 
   return (
     <div>
-      <h2>blogs</h2>
-      <p>{user.name} logged in</p>
-      <button
-        onClick={() => {
-          window.localStorage.removeItem('loggedBlogAppUser')
-          userDispatch(clearUser())
+      <div
+        style={{
+          backgroundColor: 'lightgrey',
+          padding: '5px',
+          display: 'block',
+          width: '100%',
         }}
       >
-        logout
-      </button>
+        <Link to="/" style={{ marginRight: '10px' }}>
+          blogs
+        </Link>
+        <Link to="/users" style={{ marginRight: '10px' }}>
+          users
+        </Link>
+        <span style={{ marginRight: '10px' }}>{user.name} logged in</span>
+        <button
+          style={{ marginRight: '10px' }}
+          onClick={() => {
+            window.localStorage.removeItem('loggedBlogAppUser')
+            userDispatch(clearUser())
+          }}
+        >
+          logout
+        </button>
+      </div>
+      <h2>blog app</h2>
       <Notification info={notification} />
       <Routes>
         <Route

@@ -45,4 +45,18 @@ const create = async (newBlog) => {
   return response.data
 }
 
-export default { getAll, getAllForUser, create, putBlog, deleteBlog }
+const addComment = async (blogId, comment) => {
+  const response = await axios.post(`${baseUrl}/${blogId}/comments`, {
+    comment,
+  })
+  return response.data
+}
+
+export default {
+  getAll,
+  getAllForUser,
+  create,
+  putBlog,
+  deleteBlog,
+  addComment,
+}

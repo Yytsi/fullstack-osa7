@@ -1,9 +1,11 @@
 import { useQuery } from '@tanstack/react-query'
 import blogService from '../services/blogs'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useState } from 'react'
 
 export const BlogExtView = ({ blog, showRemoveButton, likeBlog }) => {
   const queryClient = useQueryClient()
+  const [comment, setComment] = useState('')
 
   const deleteBlogMutation = useMutation({
     mutationFn: (blog) => blogService.deleteBlog(blog),
@@ -19,6 +21,17 @@ export const BlogExtView = ({ blog, showRemoveButton, likeBlog }) => {
       } catch (error) {
         console.error(error)
       }
+    }
+  }
+
+  const handleAddComment = async (event) => {
+    event.preventDefault()
+    try {
+      await blogService.addComment(blog.id, comment)
+      setComment('')
+      queryClient.invalidateQueries({ queryKey: ['blogs'] })
+    } catch (error) {
+      console.error(error)
     }
   }
 
@@ -38,6 +51,14 @@ export const BlogExtView = ({ blog, showRemoveButton, likeBlog }) => {
       {showRemoveButton && <button onClick={handleRemove}>remove</button>}
 
       <h3>comments</h3>
+      <form onSubmit={handleAddComment}>
+        <input
+          type="text"
+          value={comment}
+          onChange={({ target }) => setComment(target.value)}
+        />
+        <button type="submit">add comment</button>
+      </form>
       <ul>
         {blog.comments.map((comment, index) => (
           <li key={index}>{comment}</li>

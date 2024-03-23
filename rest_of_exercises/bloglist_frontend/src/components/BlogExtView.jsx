@@ -1,4 +1,3 @@
-import { useQuery } from '@tanstack/react-query'
 import blogService from '../services/blogs'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
@@ -36,7 +35,7 @@ export const BlogExtView = ({ blog, showRemoveButton, likeBlog }) => {
   }
 
   if (!blog) {
-    return <div>blog doesn't exist or is not loaded properly yet</div>
+    return <div>blog does not exist or is not loaded properly yet</div>
   }
 
   return (
